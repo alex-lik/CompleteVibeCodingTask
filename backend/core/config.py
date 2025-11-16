@@ -1,27 +1,32 @@
 import os
 from typing import List
+from pydantic_settings import BaseSettings
 
-class Settings:
+
+class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./agent_task_tracker.db")
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/agent_tracker"
 
     # Redis
-    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
+    REDIS_URL: str = "redis://localhost:6379"
 
     # API
-    HOST: str = os.getenv("HOST", "0.0.0.0")
-    PORT: int = int(os.getenv("PORT", "8001"))
-    DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
+    HOST: str = "0.0.0.0"
+    PORT: int = 8001
+    DEBUG: bool = True
 
     # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
-    API_KEY: str = os.getenv("API_KEY", "dev-api-key")
+    SECRET_KEY: str = "dev-secret-key"
+    API_KEY: str = "dev-api-key"
 
     # CORS
     ALLOWED_HOSTS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
 
     # Environment
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    ENVIRONMENT: str = "development"
+
+    class Config:
+        env_file = ".env"
 
 
 settings = Settings()
