@@ -7,6 +7,8 @@ from core.config import settings
 from core.database import engine, get_db
 from core.redis import redis_client
 from models.models import Base
+from webhook.routes import webhook_router
+# from webhook.websocket_routes import websocket_router  # Временно отключен
 
 
 @asynccontextmanager
@@ -41,6 +43,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Подключение webhook роутеров
+app.include_router(webhook_router, prefix="/webhook", tags=["webhook"])
+# app.include_router(websocket_router, prefix="/webhook", tags=["websocket"])  # Временно отключен
 
 
 @app.get("/")
