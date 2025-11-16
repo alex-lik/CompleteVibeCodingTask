@@ -5,6 +5,7 @@ import uvicorn
 
 from core.config import settings
 from core.database import engine, get_db
+from core.redis import redis_client
 from models.models import Base
 
 
@@ -14,8 +15,15 @@ async def lifespan(app: FastAPI):
     print("Creating database tables...")
     Base.metadata.create_all(bind=engine)
     print("Database tables created successfully!")
+
+    # Подключение к Redis
+    print("Connecting to Redis...")
+    await redis_client.connect()
+
     yield
-    # Shutdown
+    # Shutdown: отключение от Redis
+    print("Disconnecting from Redis...")
+    await redis_client.disconnect()
 
 
 app = FastAPI(
@@ -57,6 +65,31 @@ async def db_check():
             "status": "connected",
             "database": settings.DATABASE_URL.split('@')[1],
             "version": version
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.get("/redis-check")
+async def redis_check():
+    """Проверка подключения к Redis"""
+    try:
+        if not redis_client.redis:
+            await redis_client.connect()
+
+        # Тестовая операция
+        await redis_client.set("test_key", "test_value", expire=10)
+        test_result = await redis_client.get("test_key")
+
+        # Получение информации о Redis
+        info = await redis_client.redis.info()
+
+        return {
+            "status": "connected",
+            "redis_url": settings.REDIS_URL,
+            "version": info.get("redis_version"),
+            "test_operation": "success" if test_result == "test_value" else "failed",
+            "used_memory": info.get("used_memory_human")
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
