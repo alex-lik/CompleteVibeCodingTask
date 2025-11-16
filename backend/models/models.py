@@ -61,3 +61,14 @@ class Task(Base):
     # Отношения
     project = relationship("Project", back_populates="tasks")
     agent = relationship("Agent", back_populates="tasks")
+
+
+class Settings(Base):
+    __tablename__ = "settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String(255), unique=True, index=True, nullable=False)
+    value = Column(Text, nullable=True)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
