@@ -119,20 +119,52 @@ async def webhook_finish(
 @webhook_router.post("/status", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_status(
     data: WebhookStatus,
-    api_key: str = Depends(verify_api_key)
+    api_key: str = Depends(verify_api_key),
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
     Принимает вебхук о статусе задачи
     """
-    # TODO: Обновить в базе данных
-    # TODO: Отправить WebSocket уведомление
+    webhook_service = WebhookService(db)
 
-    return {
-        "status": "accepted",
-        "message": "Status updated",
-        "task_id": data.task_id,
-        "project": data.project
-    }
+    try:
+        task = webhook_service.handle_status_webhook(data)
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task with ID {data.task_id} not found"
+            )
+
+        # TODO: Отправить WebSocket уведомление (временно отключено)
+        # await websocket_service.notify_task_status_updated({
+        #     "task_id": data.task_id,
+        #     "project": data.project,
+        #     "task": data.task,
+        #     "agent": data.agent,
+        #     "status": task.status,
+        #     "database_id": task.id,
+        #     "progress": task.progress,
+        #     "message": data.message,
+        #     "metadata": data.metadata
+        # })
+
+        return {
+            "status": "accepted",
+            "message": "Status updated successfully",
+            "task_id": data.task_id,
+            "project": data.project,
+            "database_id": task.id,
+            "status_in_db": task.status,
+            "progress": task.progress
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process webhook: {str(e)}"
+        )
 
 
 @webhook_router.post("/error", status_code=status.HTTP_202_ACCEPTED)
