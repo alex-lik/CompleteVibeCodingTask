@@ -350,10 +350,54 @@ function StatusIndicator() {
 }
 ```
 
+## [1.1.0] - 2025-11-17
+
+### Added
+- **Production Dockerfile for Backend** - Создан полноценный production Dockerfile для backend
+  - **Multi-stage build optimization** - Оптимизированная сборка с минимальным размером образа
+  - **Security hardening** - Non-root user execution и привилегии безопасности
+  - **Health checks** - Встроенная проверка работоспособности приложения
+  - **PostgreSQL dependencies** - Полный набор зависимостей для работы с PostgreSQL
+  - **Production-ready configuration** - Настройки для production окружения
+  - **Dockerignore file** - Оптимизированный .dockerignore для ускорения сборки
+- **Docker configuration files**
+  - `backend/Dockerfile` - Production Dockerfile с best practices
+  - `backend/.dockerignore` - Исключение ненужных файлов из образа
+  - System dependencies: gcc, postgresql-client, postgresql, libpq-dev, curl
+
+### Technical Implementation
+- **Base Image**: Python 3.14-slim для минимального размера
+- **Security**: Non-root пользователь 'appuser' с ограниченными правами
+- **Environment Variables**: Оптимизированные настройки Python для production
+- **Health Monitoring**: Встроенный health-check на /health endpoint
+- **Dependencies**: Все необходимые системные библиотеки для PostgreSQL
+- **Optimization**: .dockerignore для исключения development файлов
+
+### Docker Usage
+```bash
+# Build production image
+cd backend
+docker build -t agent-tracker-backend:latest .
+
+# Run container
+docker run -d \
+  --name agent-tracker-backend \
+  -p 8000:8000 \
+  -e DATABASE_URL=postgresql://user:pass@host:5432/dbname \
+  -e REDIS_URL=redis://host:6379/0 \
+  agent-tracker-backend:latest
+```
+
+### Security Features
+- Non-root execution
+- Minimal base image
+- No development dependencies
+- Health monitoring
+- Environment-based configuration
+
 ## [Unreleased]
 
 ### Planned
-- Production Docker configuration
 - CI/CD pipeline setup
 - Agent filtering re-implementation with proper SQLAlchemy relationships
 - Дополнительные компоненты фронтенда

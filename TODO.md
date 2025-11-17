@@ -56,7 +56,7 @@
 - [x] Настройки темы
 
 ## Docker & Deployment
-- [ ] Production Dockerfile backend
+- [x] Production Dockerfile backend
 - [ ] Production Dockerfile frontend
 - [ ] Docker Compose
 - [ ] Health-checks
