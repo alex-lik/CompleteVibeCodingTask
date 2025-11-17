@@ -34,11 +34,11 @@
 - [x] Тесты (pytest)
 
 ## MCP и скрипты
-- [ ] Сделать MCP-адаптер
-- [ ] Пример интеграции MCP
-- [ ] Создать send_start.sh
-- [ ] Создать send_finish.sh
-- [ ] Версии для Windows (.bat)
+- [x] Сделать MCP-адаптер
+- [x] Пример интеграции MCP
+- [x] Создать send_start.sh
+- [x] Создать send_finish.sh
+- [x] Версии для Windows (.bat)
 
 ## Frontend
 - [ ] Инициализировать Vite + React

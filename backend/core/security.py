@@ -45,3 +45,10 @@ async def verify_websocket_connection(api_key: Optional[str] = None) -> bool:
     if api_key and api_key != settings.API_KEY:
         return False
     return True
+
+
+def verify_api_key(api_key: str) -> bool:
+    """
+    Простая проверка API ключа
+    """
+    return api_key == settings.API_KEY

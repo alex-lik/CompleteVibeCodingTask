@@ -5,6 +5,92 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-01-17
+
+### Added
+- **MCP (Model Context Protocol) адаптер** - Полноценная поддержка интеграции с AI-агентами
+  - `MCPAdapter` класс для асинхронной работы с API
+  - `MCPContextManager` удобный контекстный менеджер для агентов
+  - Поддержка всех операций: start, finish, status, error
+  - Автоматические retry механизмы и обработка ошибок
+  - Функция `create_mcp_context()` для быстрого создания контекста
+- **Скрипты для вебхуков** - Shell и Batch скрипты для отправки вебхуков
+  - `send_start.sh` и `send_start.bat` для уведомлений о начале задач
+  - `send_finish.sh` и `send_finish.bat` для уведомлений о завершении задач
+  - Поддержка всех параметров: project, task, agent, task_id, duration и metadata
+  - Генерация автоматических task_id на основе timestamp
+  - Подробные примеры использования
+- **Примеры интеграции MCP** - Полные примеры использования MCP адаптера
+  - Базовые операции с MCPAdapter
+  - Продвинутые сценарии с MCPContextManager
+  - Интеграция с CI/CD pipelines
+  - Примеры обработки ошибок
+- **Комплексная документация MCP** - Подробная документация в scripts/README.md
+  - API reference для всех классов и методов
+  - Примеры кода для Python, Shell и Windows
+  - Инструкции по установке и настройке
+  - Руководство по тестированию
+- **Тесты MCP адаптера** - 19 тестов обеспечивающих полное покрытие функциональности
+  - Тесты конфигурации и контекстных менеджеров
+  - Тесты всех API операций
+  - Тесты обработки ошибок
+  - Интеграционные тесты
+- **Улучшения безопасности** - Добавлена функция `verify_api_key()` в core/security.py
+- **Обновление зависимостей** - Добавлен httpx для HTTP клиентской функциональности
+- **Обновленная документация** - Раздел MCP добавлен в основной README.md
+
+### Changed
+- **Структура проекта** - Добавлена директория `mcp/` с MCP адаптером
+- **Конфигурация** - Добавлен `BASE_URL` параметр для MCP адаптера
+- **Порт сервера** - Изменен на 8002 для избежания конфликтов
+- **Количество тестов** - Увеличено с 15+ до 20+ тестов
+
+### Fixed
+- **Импорты MCP** - Исправлены импорты для использования httpx вместо aiohttp
+- **Конфигурация портов** - Исправлены проблемы с определением порта для API вызовов
+- **Совместимость тестов** - Исправлены тесты для работы с pytest-asyncio
+
+### Technical Implementation
+- **HTTP клиент**: Переход с aiohttp на httpx для лучшей совместимости
+- **Асинхронные операции**: Полная поддержка async/await во всех MCP операциях
+- **Обработка ошибок**: Расширенная система retry и error handling
+- **Контекстные менеджеры**: Безопасное управление ресурсами HTTP клиента
+- **JSON сериализация**: Улучшенная обработка JSON payloads
+- **Логирование**: Интеграция со стандартной системой логирования Python
+
+### API Usage Examples
+```python
+# Простое использование
+from mcp import MCPAdapter
+
+async with MCPAdapter() as mcp:
+    await mcp.start_task(
+        project="my-project",
+        task="Data processing",
+        task_id="task-123",
+        agent="claude-3-5"
+    )
+
+# Контекстный менеджер
+from mcp import create_mcp_context
+
+async with create_mcp_context("agent", "project") as ctx:
+    task_id = await ctx.start_task("My task")
+    await ctx.update_progress(50, "Half done")
+    await ctx.complete_task("Task completed")
+```
+
+### Script Usage Examples
+```bash
+# Shell скрипты
+./send_start.sh my-project "Build app" github-actions
+./send_finish.sh my-project "Build app" github-actions "Success" "" 120
+
+# Batch скрипты (Windows)
+send_start.bat my-project "Build app" github-actions
+send_finish.bat my-project "Build app" github-actions "Success" task-123 300
+```
+
 ## [0.7.0] - 2025-01-17
 
 ### Fixed

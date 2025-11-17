@@ -12,8 +12,9 @@ class Settings(BaseSettings):
 
     # API
     HOST: str = "0.0.0.0"
-    PORT: int = 8001
+    PORT: int = 8000
     DEBUG: bool = True
+    BASE_URL: str = f"http://localhost:8002"
 
     # Security
     SECRET_KEY: str = "dev-secret-key"
