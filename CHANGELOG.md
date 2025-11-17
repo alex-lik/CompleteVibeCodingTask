@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-01-17
+
+### Fixed
+- **Data model consistency issues** - Fixed mismatches between database models and API schemas
+- **Task field mapping** - Corrected `task` vs `title` field inconsistencies across API endpoints
+- **Agent relationship filtering** - Fixed search functionality for agent-based filtering
+- **API response serialization** - Improved TaskResponse object creation and data mapping
+- **Database query optimization** - Enhanced SQLAlchemy queries for better performance
+
+### Changed
+- **Models**: Updated TaskResponse schema to properly handle database model fields
+- **API routes**: Fixed agent filtering in search endpoints using proper SQLAlchemy relationships
+- **Data consistency**: Unified field naming across models, schemas, and API responses
+- **Error handling**: Improved error messages for database query failures
+
+### Tested
+- **Pagination functionality**: Verified limit/offset parameters work correctly
+- **Filter system**: Confirmed status, date range, and task name filtering
+- **Search functionality**: Validated global task search across projects
+- **API responses**: Tested paginated response formats with proper metadata
+
+---
+
 ## [0.6.0] - 2025-01-17
 
 ### Added

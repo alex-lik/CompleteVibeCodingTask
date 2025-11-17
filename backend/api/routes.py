@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from core.database import get_db
 from core.security import get_api_key
-from models.models import Project, Task
+from models.models import Project, Task, Agent
 from models.schemas import ProjectResponse, TaskResponse, StatsResponse, PaginationParams, PaginatedProjectResponse, PaginatedTaskResponse
 from services.websocket_service import websocket_service
 
@@ -79,10 +79,10 @@ async def get_project_tasks(
         query = query.filter(Task.status == status)
 
     if agent:
-        query = query.filter(Task.agent == agent)
+        query = query.filter(Task.agent.has(Agent.name == agent))
 
     if task_name:
-        query = query.filter(Task.task.ilike(f"%{task_name}%"))
+        query = query.filter(Task.title.ilike(f"%{task_name}%"))
 
     if from_date:
         query = query.filter(Task.created_at >= from_date)
@@ -93,28 +93,28 @@ async def get_project_tasks(
     total = query.count()
     tasks = query.order_by(Task.created_at.desc()).offset(offset).limit(limit).all()
 
-    # Fill agent_name field
+    # Create TaskResponse objects directly from models
     task_responses = []
     for task in tasks:
-        task_data = {
-            "id": task.id,
-            "project_id": task.project_id,
-            "task_id": task.task_id,
-            "task": task.title,
-            "agent": task.agent.name if task.agent else "",
-            "status": task.status,
-            "created_at": task.created_at,
-            "updated_at": task.updated_at,
-            "started_at": task.started_at,
-            "finished_at": task.finished_at,
-            "result": task.result,
-            "error_message": task.error_message,
-            "duration_seconds": task.duration_seconds,
-            "progress": task.progress,
-            "task_metadata": task.task_metadata,
-            "agent_name": task.agent.name if task.agent else None
-        }
-        task_responses.append(TaskResponse(**task_data))
+        task_response = TaskResponse(
+            id=task.id,
+            project_id=task.project_id,
+            task_id=task.task_id,
+            task=task.title,
+            agent=task.agent.name if task.agent else "",
+            status=task.status,
+            created_at=task.created_at,
+            updated_at=task.updated_at,
+            started_at=task.started_at,
+            finished_at=task.finished_at,
+            result=task.result,
+            error_message=task.error_message,
+            duration_seconds=task.duration_seconds,
+            progress=task.progress,
+            task_metadata=task.task_metadata,
+            agent_name=task.agent.name if task.agent else None
+        )
+        task_responses.append(task_response)
 
     return PaginatedTaskResponse(
         items=task_responses,
@@ -149,13 +149,13 @@ async def search_tasks(
         query = query.filter(Task.status == status)
 
     if agent:
-        query = query.filter(Task.agent == agent)
+        query = query.filter(Task.agent.has(Agent.name == agent))
 
     if project_name:
         query = query.join(Task.project).filter(Project.name == project_name)
 
     if task_name:
-        query = query.filter(Task.task.ilike(f"%{task_name}%"))
+        query = query.filter(Task.title.ilike(f"%{task_name}%"))
 
     if from_date:
         query = query.filter(Task.created_at >= from_date)
@@ -166,28 +166,28 @@ async def search_tasks(
     total = query.count()
     tasks = query.order_by(Task.created_at.desc()).offset(offset).limit(limit).all()
 
-    # Fill agent_name field
+    # Create TaskResponse objects directly from models
     task_responses = []
     for task in tasks:
-        task_data = {
-            "id": task.id,
-            "project_id": task.project_id,
-            "task_id": task.task_id,
-            "task": task.title,
-            "agent": task.agent.name if task.agent else "",
-            "status": task.status,
-            "created_at": task.created_at,
-            "updated_at": task.updated_at,
-            "started_at": task.started_at,
-            "finished_at": task.finished_at,
-            "result": task.result,
-            "error_message": task.error_message,
-            "duration_seconds": task.duration_seconds,
-            "progress": task.progress,
-            "task_metadata": task.task_metadata,
-            "agent_name": task.agent.name if task.agent else None
-        }
-        task_responses.append(TaskResponse(**task_data))
+        task_response = TaskResponse(
+            id=task.id,
+            project_id=task.project_id,
+            task_id=task.task_id,
+            task=task.title,
+            agent=task.agent.name if task.agent else "",
+            status=task.status,
+            created_at=task.created_at,
+            updated_at=task.updated_at,
+            started_at=task.started_at,
+            finished_at=task.finished_at,
+            result=task.result,
+            error_message=task.error_message,
+            duration_seconds=task.duration_seconds,
+            progress=task.progress,
+            task_metadata=task.task_metadata,
+            agent_name=task.agent.name if task.agent else None
+        )
+        task_responses.append(task_response)
 
     return PaginatedTaskResponse(
         items=task_responses,
@@ -212,26 +212,24 @@ async def get_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    task_data = {
-        "id": task.id,
-        "project_id": task.project_id,
-        "task_id": task.task_id,
-        "task": task.task,
-        "agent": task.agent.name if task.agent else "",
-        "status": task.status,
-        "created_at": task.created_at,
-        "updated_at": task.updated_at,
-        "started_at": task.started_at,
-        "finished_at": task.finished_at,
-        "result": task.result,
-        "error_message": task.error_message,
-        "duration_seconds": task.duration_seconds,
-        "progress": task.progress,
-        "task_metadata": task.task_metadata,
-        "agent_name": task.agent.name if task.agent else None
-    }
-
-    return TaskResponse(**task_data)
+    return TaskResponse(
+        id=task.id,
+        project_id=task.project_id,
+        task_id=task.task_id,
+        task=task.title,
+        agent=task.agent.name if task.agent else "",
+        status=task.status,
+        created_at=task.created_at,
+        updated_at=task.updated_at,
+        started_at=task.started_at,
+        finished_at=task.finished_at,
+        result=task.result,
+        error_message=task.error_message,
+        duration_seconds=task.duration_seconds,
+        progress=task.progress,
+        task_metadata=task.task_metadata,
+        agent_name=task.agent.name if task.agent else None
+    )
 
 
 @api_router.get("/stats", response_model=StatsResponse)

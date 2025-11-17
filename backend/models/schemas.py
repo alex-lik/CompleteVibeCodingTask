@@ -109,14 +109,6 @@ class TaskResponse(TaskBase):
     task_metadata: Optional[Dict[str, Any]] = None
     agent_name: Optional[str] = None
 
-    @property
-    def title(self) -> str:
-        return getattr(self, 'title', self.task)
-
-    @property
-    def description(self) -> Optional[str]:
-        return getattr(self, 'description', None)
-
     model_config = {"from_attributes": True}
 
 
