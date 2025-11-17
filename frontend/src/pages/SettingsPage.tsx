@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { settingsApi } from '../utils/api';
+import { WebSocketDebug } from '../components/WebSocketDebug';
 import type { UserSettings } from '../types';
 
 function SettingsPage() {
@@ -85,6 +86,12 @@ function SettingsPage() {
           </div>
         </div>
 
+        {/* WebSocket Debug */}
+        <div className="border rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">WebSocket Отладка</h2>
+          <WebSocketDebug />
+        </div>
+
         {/* User Preferences */}
         <div className="border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Пользовательские настройки</h2>
@@ -123,7 +130,7 @@ function SettingsPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Backend URL:</span>
-              <span>{import.meta.env.VITE_API_URL || 'http://localhost:8002'}</span>
+              <span>http://localhost:8002</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">WebSocket:</span>

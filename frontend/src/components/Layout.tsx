@@ -1,5 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { WebSocketStatusIndicator } from './WebSocketConnection';
 
 const navigation = [
   { name: 'Проекты', href: '/' },
@@ -8,11 +9,7 @@ const navigation = [
   { name: 'Настройки', href: '/settings' },
 ];
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-function Layout({ children }: LayoutProps) {
+function Layout() {
   const location = useLocation();
 
   return (
@@ -45,13 +42,16 @@ function Layout({ children }: LayoutProps) {
                 })}
               </div>
             </div>
+            <div className="flex items-center">
+              <WebSocketStatusIndicator />
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Main content */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+        <Outlet />
       </main>
     </div>
   );
