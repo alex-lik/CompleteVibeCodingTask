@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from typing import Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 from models.models import Project, Agent, Task
 from models.schemas import WebhookStart, WebhookFinish, WebhookStatus, WebhookError
@@ -45,7 +45,7 @@ class WebhookService:
             task.title = data.task
             task.description = data.task  # Используем то же поле для описания
             task.status = "running"
-            task.started_at = datetime.utcnow()
+            task.started_at = datetime.now(timezone.utc)
             task.task_metadata = data.metadata
             task.project_id = project.id
             task.agent_id = agent.id
@@ -56,7 +56,7 @@ class WebhookService:
                 title=data.task,
                 description=data.task,
                 status="running",
-                started_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc),
                 task_metadata=data.metadata,
                 project_id=project.id,
                 agent_id=agent.id
@@ -79,10 +79,6 @@ class WebhookService:
         task.result = data.result
         task.duration_seconds = data.duration_seconds
         task.task_metadata = data.metadata
-
-        if task.started_at:
-            duration = (datetime.utcnow() - task.started_at).total_seconds()
-            task.duration_seconds = duration
 
         self.db.commit()
         self.db.refresh(task)

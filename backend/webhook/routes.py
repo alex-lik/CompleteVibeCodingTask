@@ -67,20 +67,53 @@ async def webhook_start(
 @webhook_router.post("/finish", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_finish(
     data: WebhookFinish,
-    api_key: str = Depends(verify_api_key)
+    api_key: str = Depends(verify_api_key),
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
     Принимает вебхук о завершении задачи
     """
-    # TODO: Обновить в базе данных
-    # TODO: Отправить WebSocket уведомление
+    webhook_service = WebhookService(db)
 
-    return {
-        "status": "accepted",
-        "message": "Task finished",
-        "task_id": data.task_id,
-        "project": data.project
-    }
+    try:
+        task = webhook_service.handle_finish_webhook(data)
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task with ID {data.task_id} not found"
+            )
+
+        # TODO: Отправить WebSocket уведомление (временно отключено)
+        # await websocket_service.notify_task_finished({
+        #     "task_id": data.task_id,
+        #     "project": data.project,
+        #     "task": data.task,
+        #     "agent": data.agent,
+        #     "status": task.status,
+        #     "database_id": task.id,
+        #     "finished_at": task.finished_at.isoformat() if task.finished_at else None,
+        #     "duration_seconds": task.duration_seconds,
+        #     "result": data.result,
+        #     "metadata": data.metadata
+        # })
+
+        return {
+            "status": "accepted",
+            "message": "Task finished successfully",
+            "task_id": data.task_id,
+            "project": data.project,
+            "database_id": task.id,
+            "status_in_db": task.status,
+            "duration_seconds": task.duration_seconds
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process webhook: {str(e)}"
+        )
 
 
 @webhook_router.post("/status", status_code=status.HTTP_202_ACCEPTED)
