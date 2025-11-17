@@ -7,22 +7,34 @@ from datetime import datetime, timezone
 from core.database import get_db
 from core.security import get_api_key
 from models.models import Project, Task
-from models.schemas import ProjectResponse, TaskResponse, StatsResponse
+from models.schemas import ProjectResponse, TaskResponse, StatsResponse, PaginationParams, PaginatedProjectResponse, PaginatedTaskResponse
 from services.websocket_service import websocket_service
 
 api_router = APIRouter()
 
 
-@api_router.get("/projects", response_model=List[ProjectResponse])
+@api_router.get("/projects", response_model=PaginatedProjectResponse)
 async def get_projects(
+    limit: int = 50,
+    offset: int = 0,
     api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ):
     """
-    Получить список всех проектов
+    Получить список всех проектов с пагинацией
     """
-    projects = db.query(Project).all()
-    return projects
+    query = db.query(Project)
+    total = query.count()
+    projects = query.order_by(Project.created_at.desc()).offset(offset).limit(limit).all()
+
+    return PaginatedProjectResponse(
+        items=projects,
+        total=total,
+        limit=limit,
+        offset=offset,
+        has_next=offset + limit < total,
+        has_prev=offset > 0
+    )
 
 
 @api_router.get("/projects/{project_name}", response_model=ProjectResponse)
@@ -40,17 +52,21 @@ async def get_project(
     return project
 
 
-@api_router.get("/projects/{project_name}/tasks", response_model=List[TaskResponse])
+@api_router.get("/projects/{project_name}/tasks", response_model=PaginatedTaskResponse)
 async def get_project_tasks(
     project_name: str,
     limit: int = 50,
     offset: int = 0,
     status: Optional[str] = None,
+    agent: Optional[str] = None,
+    from_date: Optional[datetime] = None,
+    to_date: Optional[datetime] = None,
+    task_name: Optional[str] = None,
     api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ):
     """
-    Получить список задач проекта с пагинацией и фильтрацией
+    Получить список задач проекта с пагинацией и расширенной фильтрацией
     """
     project = db.query(Project).filter(Project.name == project_name).first()
     if not project:
@@ -58,11 +74,129 @@ async def get_project_tasks(
 
     query = db.query(Task).filter(Task.project_id == project.id)
 
+    # Фильтры
     if status:
         query = query.filter(Task.status == status)
 
+    if agent:
+        query = query.filter(Task.agent == agent)
+
+    if task_name:
+        query = query.filter(Task.task.ilike(f"%{task_name}%"))
+
+    if from_date:
+        query = query.filter(Task.created_at >= from_date)
+
+    if to_date:
+        query = query.filter(Task.created_at <= to_date)
+
+    total = query.count()
     tasks = query.order_by(Task.created_at.desc()).offset(offset).limit(limit).all()
-    return tasks
+
+    # Fill agent_name field
+    task_responses = []
+    for task in tasks:
+        task_data = {
+            "id": task.id,
+            "project_id": task.project_id,
+            "task_id": task.task_id,
+            "task": task.title,
+            "agent": task.agent.name if task.agent else "",
+            "status": task.status,
+            "created_at": task.created_at,
+            "updated_at": task.updated_at,
+            "started_at": task.started_at,
+            "finished_at": task.finished_at,
+            "result": task.result,
+            "error_message": task.error_message,
+            "duration_seconds": task.duration_seconds,
+            "progress": task.progress,
+            "task_metadata": task.task_metadata,
+            "agent_name": task.agent.name if task.agent else None
+        }
+        task_responses.append(TaskResponse(**task_data))
+
+    return PaginatedTaskResponse(
+        items=task_responses,
+        total=total,
+        limit=limit,
+        offset=offset,
+        has_next=offset + limit < total,
+        has_prev=offset > 0
+    )
+
+
+@api_router.get("/tasks/search", response_model=PaginatedTaskResponse)
+async def search_tasks(
+    limit: int = 50,
+    offset: int = 0,
+    status: Optional[str] = None,
+    agent: Optional[str] = None,
+    project_name: Optional[str] = None,
+    task_name: Optional[str] = None,
+    from_date: Optional[datetime] = None,
+    to_date: Optional[datetime] = None,
+    api_key: str = Depends(get_api_key),
+    db: Session = Depends(get_db)
+):
+    """
+    Поиск задач по всем проектам с расширенной фильтрацией
+    """
+    query = db.query(Task)
+
+    # Фильтры
+    if status:
+        query = query.filter(Task.status == status)
+
+    if agent:
+        query = query.filter(Task.agent == agent)
+
+    if project_name:
+        query = query.join(Task.project).filter(Project.name == project_name)
+
+    if task_name:
+        query = query.filter(Task.task.ilike(f"%{task_name}%"))
+
+    if from_date:
+        query = query.filter(Task.created_at >= from_date)
+
+    if to_date:
+        query = query.filter(Task.created_at <= to_date)
+
+    total = query.count()
+    tasks = query.order_by(Task.created_at.desc()).offset(offset).limit(limit).all()
+
+    # Fill agent_name field
+    task_responses = []
+    for task in tasks:
+        task_data = {
+            "id": task.id,
+            "project_id": task.project_id,
+            "task_id": task.task_id,
+            "task": task.title,
+            "agent": task.agent.name if task.agent else "",
+            "status": task.status,
+            "created_at": task.created_at,
+            "updated_at": task.updated_at,
+            "started_at": task.started_at,
+            "finished_at": task.finished_at,
+            "result": task.result,
+            "error_message": task.error_message,
+            "duration_seconds": task.duration_seconds,
+            "progress": task.progress,
+            "task_metadata": task.task_metadata,
+            "agent_name": task.agent.name if task.agent else None
+        }
+        task_responses.append(TaskResponse(**task_data))
+
+    return PaginatedTaskResponse(
+        items=task_responses,
+        total=total,
+        limit=limit,
+        offset=offset,
+        has_next=offset + limit < total,
+        has_prev=offset > 0
+    )
 
 
 @api_router.get("/tasks/{task_id}", response_model=TaskResponse)
@@ -77,7 +211,27 @@ async def get_task(
     task = db.query(Task).filter(Task.task_id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
-    return task
+
+    task_data = {
+        "id": task.id,
+        "project_id": task.project_id,
+        "task_id": task.task_id,
+        "task": task.task,
+        "agent": task.agent.name if task.agent else "",
+        "status": task.status,
+        "created_at": task.created_at,
+        "updated_at": task.updated_at,
+        "started_at": task.started_at,
+        "finished_at": task.finished_at,
+        "result": task.result,
+        "error_message": task.error_message,
+        "duration_seconds": task.duration_seconds,
+        "progress": task.progress,
+        "task_metadata": task.task_metadata,
+        "agent_name": task.agent.name if task.agent else None
+    }
+
+    return TaskResponse(**task_data)
 
 
 @api_router.get("/stats", response_model=StatsResponse)

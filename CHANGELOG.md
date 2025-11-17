@@ -13,6 +13,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD pipeline setup
 
 ### Added
+- **Advanced pagination and filtering system** - Complete implementation for all API endpoints
+- **Paginated response models** - `PaginatedProjectResponse` and `PaginatedTaskResponse` with metadata
+- **Enhanced filtering capabilities** - Support for status, agent, date range, and task name filters
+- **Global task search endpoint** - `/api/tasks/search` with cross-project filtering
+- **Flexible pagination parameters** - Configurable limits (1-100) and offset controls
+- **Pagination metadata** - `has_next` and `has_prev` flags for navigation
+- **Enhanced API response schemas** - Proper handling of related objects and agent names
+
+### Changed
+- **API**: Updated `/api/projects` endpoint with paginated response format
+- **API**: Enhanced `/api/projects/{name}/tasks` with advanced filtering options
+- **API**: Added `/api/tasks/search` endpoint for global task filtering
+- **Schemas**: Updated all Pydantic models to handle nullable datetime fields
+- **Responses**: Improved serialization to avoid circular references
+- **Security**: Maintained API key authentication across all new endpoints
+
+---
+
+## [0.4.0] - 2025-01-17
+
+### Added
+- **Advanced pagination and filtering system** - Complete implementation for all API endpoints
+- **Paginated response models** - `PaginatedProjectResponse` and `PaginatedTaskResponse` with metadata
+- **Enhanced filtering capabilities** - Support for status, agent, date range, and task name filters
+- **Global task search endpoint** - `/api/tasks/search` with cross-project filtering
+- **Flexible pagination parameters** - Configurable limits (1-100) and offset controls
+- **Pagination metadata** - `has_next` and `has_prev` flags for navigation
+- **Enhanced API response schemas** - Proper handling of related objects and agent names
+
+### Changed
+- **API**: Updated `/api/projects` endpoint with paginated response format
+- **API**: Enhanced `/api/projects/{name}/tasks` with advanced filtering options
+- **API**: Added `/api/tasks/search` endpoint for global task filtering
+- **Schemas**: Updated all Pydantic models to handle nullable datetime fields
+- **Responses**: Improved serialization to avoid circular references
+- **Security**: Maintained API key authentication across all new endpoints
+
+---
+
+### Added
 - **Extended API Key authentication** - Full authorization system implementation
 - Unified security module (`core/security.py`) with common authentication functions
 - API Key authorization for all REST API endpoints (`/api/*`)

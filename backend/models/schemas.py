@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 
 
@@ -48,11 +48,8 @@ class Project(ProjectBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    task_count: int = 0
-    active_task_count: int = 0
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class TaskBase(BaseModel):
@@ -77,26 +74,32 @@ class Task(TaskBase):
     error_message: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 # API Response Models
 class ProjectResponse(ProjectBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
-    task_count: int = 0
-    active_task_count: int = 0
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    @property
+    def task_count(self) -> int:
+        return len(getattr(self, 'tasks', []))
+
+    @property
+    def active_task_count(self) -> int:
+        if not hasattr(self, 'tasks'):
+            return 0
+        return sum(1 for task in self.tasks if task.status == "running")
+
+    model_config = {"from_attributes": True}
 
 
 class TaskResponse(TaskBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
     result: Optional[str] = None
@@ -104,9 +107,40 @@ class TaskResponse(TaskBase):
     duration_seconds: Optional[float] = None
     progress: Optional[float] = None
     task_metadata: Optional[Dict[str, Any]] = None
+    agent_name: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    @property
+    def title(self) -> str:
+        return getattr(self, 'title', self.task)
+
+    @property
+    def description(self) -> Optional[str]:
+        return getattr(self, 'description', None)
+
+    model_config = {"from_attributes": True}
+
+
+class PaginationParams(BaseModel):
+    limit: int = Field(default=50, ge=1, le=100, description="Количество элементов на странице")
+    offset: int = Field(default=0, ge=0, description="Смещение для пагинации")
+
+
+class PaginatedProjectResponse(BaseModel):
+    items: List[ProjectResponse]
+    total: int
+    limit: int
+    offset: int
+    has_next: bool
+    has_prev: bool
+
+
+class PaginatedTaskResponse(BaseModel):
+    items: List[TaskResponse]
+    total: int
+    limit: int
+    offset: int
+    has_next: bool
+    has_prev: bool
 
 
 class StatsResponse(BaseModel):
