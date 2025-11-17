@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from models.models import Project, Agent, Task
 from models.schemas import WebhookStart, WebhookFinish, WebhookStatus, WebhookError
+from services.websocket_service import websocket_service
 
 
 class WebhookService:
@@ -65,6 +66,20 @@ class WebhookService:
 
         self.db.commit()
         self.db.refresh(task)
+
+        # Отправляем WebSocket уведомление
+        task_data = {
+            "task_id": task.task_id,
+            "title": task.title,
+            "project": project.name,
+            "agent": agent.name,
+            "status": task.status,
+            "started_at": task.started_at.isoformat() if task.started_at else None,
+            "project_id": project.id
+        }
+        import asyncio
+        asyncio.create_task(websocket_service.notify_task_started(task_data))
+
         return task
 
     def handle_finish_webhook(self, data: WebhookFinish) -> Optional[Task]:
@@ -82,6 +97,26 @@ class WebhookService:
 
         self.db.commit()
         self.db.refresh(task)
+
+        # Отправляем WebSocket уведомление
+        project = self.db.query(Project).filter(Project.id == task.project_id).first()
+        agent = self.db.query(Agent).filter(Agent.id == task.agent_id).first()
+
+        if project:
+            task_data = {
+                "task_id": task.task_id,
+                "title": task.title,
+                "project": project.name,
+                "agent": agent.name if agent else "Unknown",
+                "status": task.status,
+                "duration_seconds": task.duration_seconds,
+                "finished_at": task.finished_at.isoformat() if task.finished_at else None,
+                "result": task.result,
+                "project_id": project.id
+            }
+            import asyncio
+            asyncio.create_task(websocket_service.notify_task_finished(task_data))
+
         return task
 
     def handle_status_webhook(self, data: WebhookStatus) -> Optional[Task]:
@@ -91,6 +126,7 @@ class WebhookService:
         if not task:
             return None
 
+        old_status = task.status
         task.status = data.status
         task.progress = data.progress
         task.task_metadata = data.metadata
@@ -100,6 +136,26 @@ class WebhookService:
 
         self.db.commit()
         self.db.refresh(task)
+
+        # Отправляем WebSocket уведомление только если статус изменился
+        if old_status != data.status:
+            project = self.db.query(Project).filter(Project.id == task.project_id).first()
+            agent = self.db.query(Agent).filter(Agent.id == task.agent_id).first()
+
+            if project:
+                task_data = {
+                    "task_id": task.task_id,
+                    "title": task.title,
+                    "project": project.name,
+                    "agent": agent.name if agent else "Unknown",
+                    "status": task.status,
+                    "progress": task.progress,
+                    "message": data.message,
+                    "project_id": project.id
+                }
+                import asyncio
+                asyncio.create_task(websocket_service.notify_task_status_updated(task_data))
+
         return task
 
     def handle_error_webhook(self, data: WebhookError) -> Optional[Task]:
@@ -119,4 +175,24 @@ class WebhookService:
 
         self.db.commit()
         self.db.refresh(task)
+
+        # Отправляем WebSocket уведомление
+        project = self.db.query(Project).filter(Project.id == task.project_id).first()
+        agent = self.db.query(Agent).filter(Agent.id == task.agent_id).first()
+
+        if project:
+            task_data = {
+                "task_id": task.task_id,
+                "title": task.title,
+                "project": project.name,
+                "agent": agent.name if agent else "Unknown",
+                "status": task.status,
+                "error_type": data.error_type,
+                "error_message": data.error_message,
+                "finished_at": task.finished_at.isoformat() if task.finished_at else None,
+                "project_id": project.id
+            }
+            import asyncio
+            asyncio.create_task(websocket_service.notify_task_error(task_data))
+
         return task

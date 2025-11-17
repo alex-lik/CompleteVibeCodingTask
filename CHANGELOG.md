@@ -7,34 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Complete webhook endpoint `/webhook/error` with full database integration
-- REST API endpoints for frontend: `/api/projects`, `/api/projects/{name}/tasks`, `/api/tasks/{id}`, `/api/stats`
-- Pydantic response models for API data structures
-- Database query logic with filtering, pagination, and aggregation
-- Statistics calculation including average task duration
-- API route integration into main application
-- Basic test suite with pytest for API endpoints
-- Test fixtures for database setup and teardown
-- Health check endpoints for database and Redis connectivity
-- API documentation with Swagger/OpenAPI integration
-- Comprehensive project README with API examples
-- Environment setup documentation for development
-
-### Changed
-- Enhanced Task model to support error logging and status tracking
-- Improved WebhookService with error webhook handling
-- Updated database models to include error_message and stack_trace fields
-- Enhanced API documentation with detailed examples
-- Added CORS middleware for frontend integration
-- Updated configuration management
-
 ### Planned
-- WebSocket support for real-time notifications
 - Frontend implementation with React and shadcn/ui
 - Authentication system enhancements
 - Production Docker configuration
 - CI/CD pipeline setup
+
+---
+
+## [0.3.0] - 2025-01-17
+
+### Added
+- WebSocket integration with real-time notifications for task events
+- WebSocket endpoint: `/webhook/ws` with project-specific subscriptions
+- WebSocket API endpoint for connection statistics: `/api/websocket/stats`
+- Real-time notifications for task start, finish, status updates, and errors
+- Comprehensive WebSocket service with connection management
+- Test suite for WebSocket functionality
+- WebSocket documentation and usage examples
+- Integration of WebSocket notifications with webhook processing
+
+### Changed
+- Enabled WebSocket functionality in main application
+- Enhanced WebhookService to trigger WebSocket notifications
+- Added WebSocket support to all webhook processing
+- Improved API documentation with WebSocket examples
+- Updated project README to include WebSocket API section
 
 ---
 

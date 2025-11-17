@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from core.database import get_db
 from models.models import Project, Task
 from models.schemas import ProjectResponse, TaskResponse, StatsResponse
+from services.websocket_service import websocket_service
 
 api_router = APIRouter()
 
@@ -102,3 +103,12 @@ async def get_stats(db: Session = Depends(get_db)):
         failed_tasks=failed_tasks,
         average_duration=average_duration
     )
+
+
+@api_router.get("/websocket/stats")
+async def get_websocket_stats():
+    """
+    Получить статистику WebSocket подключений
+    """
+    from fastapi.responses import JSONResponse
+    return JSONResponse(content=websocket_service.get_connection_stats())

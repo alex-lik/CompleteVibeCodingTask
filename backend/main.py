@@ -9,7 +9,7 @@ from core.redis import redis_client
 from models.models import Base
 from webhook.routes import webhook_router
 from api.routes import api_router
-# from webhook.websocket_routes import websocket_router  # Временно отключен
+from webhook.websocket_routes import websocket_router
 
 
 @asynccontextmanager
@@ -48,7 +48,7 @@ app.add_middleware(
 # Подключение роутеров
 app.include_router(webhook_router, prefix="/webhook", tags=["webhook"])
 app.include_router(api_router, prefix="/api", tags=["api"])
-# app.include_router(websocket_router, prefix="/webhook", tags=["websocket"])  # Временно отключен
+app.include_router(websocket_router, prefix="/webhook", tags=["websocket"])
 
 
 @app.get("/")

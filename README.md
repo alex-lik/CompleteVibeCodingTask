@@ -5,7 +5,7 @@
 ## Возможности
 - Приём webhook: start / finish / status / error.
 - REST API для получения проектов, задач и статистики.
-- WebSocket-уведомления (реализована, но временно отключена).
+- WebSocket-уведомления в реальном времени.
 - Хранение данных: PostgreSQL + Redis.
 - Контейнеризация Docker.
 - Тестирование: pytest.
@@ -178,6 +178,19 @@ Response:
 }
 ```
 
+#### Получить статистику WebSocket подключений
+```bash
+GET /api/websocket/stats
+Response:
+{
+  "total_connections": 3,
+  "project_connections": {
+    "my-project": 2,
+    "another-project": 1
+  }
+}
+```
+
 ## Тестирование
 
 ### Запуск тестов
@@ -243,6 +256,67 @@ curl -X POST http://localhost:8000/webhook/status \
   -d '{"project":"my-app","task":"Обработка данных","task_id":"curl-task-123","agent":"curl-agent","status":"running","progress":50}'
 ```
 
+## WebSocket API
+
+Система поддерживает WebSocket уведомления в реальном времени о событиях задач.
+
+### Подключение к WebSocket
+```javascript
+// Подключение к WebSocket
+const ws = new WebSocket('ws://localhost:8000/webhook/ws?project=my-project');
+
+// Прослушивание сообщений
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    console.log('Received:', data);
+};
+
+// Примеры сообщений:
+// Начало задачи
+{
+    "type": "task_started",
+    "data": {
+        "task_id": "task-123",
+        "title": "Разработка фичи",
+        "project": "my-project",
+        "agent": "claude-3-5",
+        "status": "running",
+        "started_at": "2024-01-01T10:00:00Z"
+    },
+    "timestamp": "2024-01-01T10:00:00Z"
+}
+
+// Завершение задачи
+{
+    "type": "task_finished",
+    "data": {
+        "task_id": "task-123",
+        "title": "Разработка фичи",
+        "project": "my-project",
+        "agent": "claude-3-5",
+        "status": "completed",
+        "duration_seconds": 1800,
+        "finished_at": "2024-01-01T10:30:00Z"
+    },
+    "timestamp": "2024-01-01T10:30:00Z"
+}
+
+// Ошибка задачи
+{
+    "type": "task_error",
+    "data": {
+        "task_id": "task-123",
+        "title": "Разработка фичи",
+        "project": "my-project",
+        "agent": "claude-3-5",
+        "status": "failed",
+        "error_type": "RuntimeError",
+        "error_message": "Ошибка выполнения"
+    },
+    "timestamp": "2024-01-01T10:30:00Z"
+}
+```
+
 ## Документация
 
 - **Swagger UI**: `http://localhost:8000/docs`
@@ -250,6 +324,7 @@ curl -X POST http://localhost:8000/webhook/status \
 - **OpenAPI JSON**: `http://localhost:8000/openapi.json`
 - **Примеры webhook**: См. раздел "Вебхук эндпоинты"
 - **Детальное API**: См. раздел "REST API эндпоинты"
+- **WebSocket статистика**: `/api/websocket/stats`
 
 ## Health Checks
 
@@ -277,12 +352,10 @@ GET /redis-check
 
 🚧 **В разработке:**
 - Frontend (React + shadcn/ui)
-- WebSocket уведомления
 - Production Dockerfile
 - CI/CD pipeline
 
 📋 **Следующие задачи (по TODO.md):**
 - API статистики
-- Реализация WebSocket уведомлений
 - Авторизация (API Key)
 - Фронтенд интерфейс
