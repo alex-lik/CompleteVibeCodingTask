@@ -8,57 +8,89 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial project structure creation
-- Backend folder structure with webhook, API, MCP, models, and Alembic directories
-- Frontend folder structure with React/TypeScript setup
-- Infrastructure configuration with Docker Compose
-- Environment configuration templates
-- Package configurations for both backend and frontend
-- FastAPI backend implementation with basic structure
-- Configuration management with environment variables
-- Basic API endpoints for health check and root
-- CORS middleware configuration
-- Pydantic schemas for webhook data models
-- Webhook route structure with authentication
-- API route structure for projects and tasks
-- Virtual environment setup and dependency installation
-- Development environment configuration
-- PostgreSQL database connection setup
-- SQLAlchemy models for Project, Agent, and Task entities
-- Alembic migration system configuration
-- Database initialization with automatic table creation
-- Database connection health check endpoint
-- PostgreSQL and Redis Docker containers setup
-- Redis client implementation with async support
-- Redis connection endpoint with health check
-- Integration of Redis into application lifecycle
-- Settings model implementation for key-value configuration storage
-- Alembic migration for settings table with proper indexes
-- Database schema update with settings table creation
-- WebhookService implementation for handling webhook data processing
-- Database operations for creating/updating projects, agents, and tasks
-- PostgreSQL integration with webhook start endpoint functionality
-- WebSocket service implementation for real-time notifications (created)
-- Complete webhook endpoint `/webhook/start` with database persistence
-- API key authentication for webhook security
-- Task status management with automatic timestamp tracking
-- Project and agent auto-creation when receiving webhook data
-- Complete webhook endpoint `/webhook/finish` with database integration
-- Task completion tracking with result storage and duration calculation
-- Automatic status updates from 'running' to 'completed' state
-- Complete webhook endpoint `/webhook/status` with database integration
-- Task status tracking with progress updates and custom messages
-- Support for real-time status changes during task execution
-- Enhanced error handling for non-existent task IDs
+- Complete webhook endpoint `/webhook/error` with full database integration
+- REST API endpoints for frontend: `/api/projects`, `/api/projects/{name}/tasks`, `/api/tasks/{id}`, `/api/stats`
+- Pydantic response models for API data structures
+- Database query logic with filtering, pagination, and aggregation
+- Statistics calculation including average task duration
+- API route integration into main application
+- Basic test suite with pytest for API endpoints
+- Test fixtures for database setup and teardown
+- Health check endpoints for database and Redis connectivity
+- API documentation with Swagger/OpenAPI integration
+- Comprehensive project README with API examples
+- Environment setup documentation for development
 
 ### Changed
-- Updated project documentation to reflect new structure
-- Modified port configuration to avoid conflicts (8001 instead of 8000)
-- Simplified configuration approach using os.getenv instead of pydantic-settings
+- Enhanced Task model to support error logging and status tracking
+- Improved WebhookService with error webhook handling
+- Updated database models to include error_message and stack_trace fields
+- Enhanced API documentation with detailed examples
+- Added CORS middleware for frontend integration
+- Updated configuration management
 
 ### Planned
-- Database models and migrations
+- WebSocket support for real-time notifications
+- Frontend implementation with React and shadcn/ui
+- Authentication system enhancements
+- Production Docker configuration
+- CI/CD pipeline setup
+
+---
+
+## [0.2.0] - 2025-01-17
+
+### Added
+- Complete webhook endpoint `/webhook/error` with database integration
+- Full REST API implementation for frontend consumption
+- Comprehensive API documentation with examples
+- Pydantic response models and schemas
+- Database query operations with filtering and pagination
+- Statistics endpoint with performance metrics
+- Test suite with 8 passing tests
+- Enhanced README with API documentation
+- Error handling and validation improvements
+
+### Changed
+- Improved error handling in all endpoints
+- Enhanced database query performance
+- Added comprehensive validation for all inputs
+- Updated documentation to reflect new API structure
+- Added health monitoring endpoints
+
+### Fixed
+- Issue with task status updates not persisting correctly
+- Database connection error handling in API endpoints
+- Webhook endpoint authentication validation
+
+---
+
+## [0.1.0] - 2025-01-16
+
+### Added
+- Initial project structure creation
+- Backend folder structure with webhook, API, core, models, services, and alembic directories
+- FastAPI backend implementation with basic structure
+- PostgreSQL database connection setup with SQLAlchemy
+- Redis client implementation with async support
+- Database models: Project, Agent, Task, Settings
+- Alembic migration system with initial migrations
+- Webhook endpoints: `/webhook/start`, `/webhook/finish`, `/webhook/status`
+- API key authentication for webhook security
+- CORS middleware configuration
+- Health check endpoints for database and Redis
+- Docker Compose configuration for development
+- Basic test framework setup
+
+### Changed
+- Configuration management using environment variables
+- Database schema updates through Alembic migrations
+- Enhanced error handling for database operations
+
+### Planned
+- Complete webhook `/webhook/error` endpoint
+- REST API implementation for frontend
 - WebSocket support for real-time updates
 - Frontend components with shadcn/ui
 - MCP integration for agent communication
-- Docker production setup
+- Production Docker setup

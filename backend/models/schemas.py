@@ -79,3 +79,40 @@ class Task(TaskBase):
 
     class Config:
         from_attributes = True
+
+
+# API Response Models
+class ProjectResponse(ProjectBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    task_count: int = 0
+    active_task_count: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class TaskResponse(TaskBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    started_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None
+    result: Optional[str] = None
+    error_message: Optional[str] = None
+    duration_seconds: Optional[float] = None
+    progress: Optional[float] = None
+    task_metadata: Optional[Dict[str, Any]] = None
+
+    class Config:
+        from_attributes = True
+
+
+class StatsResponse(BaseModel):
+    total_projects: int
+    total_tasks: int
+    active_tasks: int
+    completed_tasks: int
+    failed_tasks: int
+    average_duration: Optional[float] = None

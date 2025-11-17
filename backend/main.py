@@ -8,6 +8,7 @@ from core.database import engine, get_db
 from core.redis import redis_client
 from models.models import Base
 from webhook.routes import webhook_router
+from api.routes import api_router
 # from webhook.websocket_routes import websocket_router  # Временно отключен
 
 
@@ -44,8 +45,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Подключение webhook роутеров
+# Подключение роутеров
 app.include_router(webhook_router, prefix="/webhook", tags=["webhook"])
+app.include_router(api_router, prefix="/api", tags=["api"])
 # app.include_router(websocket_router, prefix="/webhook", tags=["websocket"])  # Временно отключен
 
 

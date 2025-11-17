@@ -170,17 +170,50 @@ async def webhook_status(
 @webhook_router.post("/error", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_error(
     data: WebhookError,
-    api_key: str = Depends(verify_api_key)
+    api_key: str = Depends(verify_api_key),
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
     Принимает вебхук об ошибке
     """
-    # TODO: Сохранить в базу данных
-    # TODO: Отправить WebSocket уведомление
+    webhook_service = WebhookService(db)
 
-    return {
-        "status": "accepted",
-        "message": "Error logged",
-        "task_id": data.task_id,
-        "project": data.project
-    }
+    try:
+        task = webhook_service.handle_error_webhook(data)
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task with ID {data.task_id} not found"
+            )
+
+        # TODO: Отправить WebSocket уведомление (временно отключено)
+        # await websocket_service.notify_task_error({
+        #     "task_id": data.task_id,
+        #     "project": data.project,
+        #     "task": data.task,
+        #     "agent": data.agent,
+        #     "status": task.status,
+        #     "database_id": task.id,
+        #     "error_type": data.error_type,
+        #     "error_message": data.error_message,
+        #     "stack_trace": data.stack_trace,
+        #     "metadata": data.metadata
+        # })
+
+        return {
+            "status": "accepted",
+            "message": "Error logged successfully",
+            "task_id": data.task_id,
+            "project": data.project,
+            "database_id": task.id,
+            "status_in_db": task.status,
+            "error_type": data.error_type
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process webhook: {str(e)}"
+        )
