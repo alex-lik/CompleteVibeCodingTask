@@ -58,7 +58,6 @@ async def get_project_tasks(
     limit: int = 50,
     offset: int = 0,
     status: Optional[str] = None,
-    agent: Optional[str] = None,
     from_date: Optional[datetime] = None,
     to_date: Optional[datetime] = None,
     task_name: Optional[str] = None,
@@ -78,9 +77,7 @@ async def get_project_tasks(
     if status:
         query = query.filter(Task.status == status)
 
-    if agent:
-        query = query.filter(Task.agent.has(Agent.name == agent))
-
+    
     if task_name:
         query = query.filter(Task.title.ilike(f"%{task_name}%"))
 
@@ -131,7 +128,6 @@ async def search_tasks(
     limit: int = 50,
     offset: int = 0,
     status: Optional[str] = None,
-    agent: Optional[str] = None,
     project_name: Optional[str] = None,
     task_name: Optional[str] = None,
     from_date: Optional[datetime] = None,
@@ -148,9 +144,7 @@ async def search_tasks(
     if status:
         query = query.filter(Task.status == status)
 
-    if agent:
-        query = query.filter(Task.agent.has(Agent.name == agent))
-
+    
     if project_name:
         query = query.join(Task.project).filter(Project.name == project_name)
 

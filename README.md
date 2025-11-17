@@ -27,7 +27,7 @@
 │  ├─ tests/            # Тесты
 │  ├─ requirements.txt  # Зависимости Python
 │  └─ README.md         # Документация backend
-├─ frontend/           # В разработке
+├─ frontend/           # React фронтенд (Vite + TypeScript)
 ├─ infra/
 │  └─ docker-compose.yml # Docker конфигурация
 ├─ scripts/            # Скрипты для агентов
@@ -58,11 +58,22 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-### 4. Локальная разработка backend
+### 4. Локальная разработка
+
+#### Backend
 ```bash
 cd backend
 python -m pip install -r requirements.txt
 python main.py
+# Сервер запустится на http://localhost:8002
+```
+
+#### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+# Фронтенд запустится на http://localhost:3000
 ```
 
 ## API Документация

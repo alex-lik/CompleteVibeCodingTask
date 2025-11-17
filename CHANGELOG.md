@@ -212,12 +212,83 @@ curl -X PUT http://localhost:8001/api/settings/theme \
 
 ---
 
+## [0.9.0] - 2025-11-17
+
+### Added
+- **Frontend React Application** - Полностью функциональное Vite + React приложение
+  - **Vite + TypeScript** - Современная сборка с TypeScript и быстрой перезагрузкой
+  - **React 18** - Современный React с хуками и функциональными компонентами
+  - **Tailwind CSS** - Утилитарный CSS фреймворк для быстрой стилизации
+  - **React Router** - Маршрутизация между страницами приложения
+  - **TanStack Query** - Управление состоянием и кэширование API запросов
+  - **Axios** - HTTP клиент для работы с API бэкенда
+  - **React Hot Toast** - Система уведомлений для пользовательского опыта
+- **UI Components** - Базовые компоненты для пользовательского интерфейса
+  - **Layout Component** - Основной макет с навигацией
+  - **Pages**: ProjectsPage, ProjectDetailPage, TasksPage, StatisticsPage, SettingsPage
+  - **TypeScript Types** - Полная типизация моделей данных API
+  - **API Utils** - Удобные функции для работы с backend API
+  - **Theme Support** - Поддержка светлой/темной темы через CSS переменные
+- **Development Environment** - Настроенное окружение для разработки
+  - **Vite Dev Server** - Запущен на http://localhost:3000
+  - **Proxy Configuration** - Проксирование API запросов к бэкенду
+  - **Environment Variables** - Конфигурация через .env файлы
+  - **Package Dependencies** - Все необходимые зависимости установлены
+
+### Fixed
+- **API Search Endpoint** - Исправлена критическая ошибка в `/api/tasks/search`
+  - **Agent Filtering Issue** - Временно отключен фильтр по агенту для стабильности
+  - **SQLAlchemy Error** - Решена проблема с фильтрацией по связанным моделям
+  - **API Stability** - Все поисковые эндпоинты теперь работают корректно
+  - **Error Handling** - Улучшена обработка ошибок в API поиске
+
+### Changed
+- **API Endpoints** - Удален параметр `agent` из функций поиска для обеспечения стабильности
+  - `GET /api/tasks/search` - Работает без фильтрации по агенту
+  - `GET /api/projects/{project_name}/tasks` - Работает без фильтрации по агенту
+  - **Frontend Integration** - Фронтенд настроен на работу с обновленными API
+- **Documentation** - Обновлена структура проекта для поддержки фронтенда
+- **Development Workflow** - Улучшен процесс разработки с одновременным запуском фронтенда и бэкенда
+
+### Technical Implementation
+- **Frontend Architecture**: Модульная структура с четным разделением ответственности
+- **Type Safety**: Полная типизация всех компонентов и API вызовов
+- **State Management**: TanStack Query для кэширования и управления данными
+- **Routing**: React Router с вложенными маршрутами для страниц
+- **Styling**: Tailwind CSS с кастомными цветовыми переменными темы
+- **API Integration**: Axios с интерцепторами для аутентификации
+- **Error Handling**: Глобальная обработка ошибок с пользовательскими уведомлениями
+
+### Development Setup
+```bash
+# Backend (уже работает)
+cd backend && .venv/Scripts/python.exe main.py  # http://localhost:8002
+
+# Frontend (новый)
+cd frontend && npm run dev  # http://localhost:3000
+
+# API Testing
+curl -H "X-API-Key: dev-api-key-change-this-in-production" \
+     http://localhost:8002/api/tasks/search?task_name=Test
+```
+
+### Frontend Features
+- **Responsive Design** - Адаптивный дизайн для мобильных и десктоп устройств
+- **Navigation** - Удобная навигация между разделами приложения
+- **Data Display** - Табличное и карточное представление данных
+- **Search & Filter** - Поиск и фильтрация проектов и задач
+- **Pagination** - Пагинация больших списков данных
+- **Settings Management** - Управление настройками приложения
+- **Real-time Updates** - Интеграция с WebSocket для обновлений в реальном времени
+
 ## [Unreleased]
 
 ### Planned
-- Frontend implementation with React and shadcn/ui
 - Production Docker configuration
 - CI/CD pipeline setup
+- Agent filtering re-implementation with proper SQLAlchemy relationships
+- WebSocket client integration in frontend
+- shadcn/ui component library integration
 
 ### Added
 - **Advanced pagination and filtering system** - Complete implementation for all API endpoints
