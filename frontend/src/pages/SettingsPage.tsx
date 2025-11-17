@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { settingsApi } from '../utils/api';
 import { WebSocketDebug } from '../components/WebSocketDebug';
@@ -7,7 +7,6 @@ import type { UserSettings } from '../types';
 
 function SettingsPage() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('api_key') || '');
-  const queryClient = useQueryClient();
 
   const {
     data: settings,
@@ -18,17 +17,17 @@ function SettingsPage() {
     queryFn: () => settingsApi.getSettings(),
   });
 
-  const updateSettingMutation = useMutation({
-    mutationFn: ({ key, value, description }: { key: string; value: any; description?: string }) =>
-      settingsApi.updateSetting(key, value, description),
-    onSuccess: () => {
-      toast.success('Настройка сохранена');
-      queryClient.invalidateQueries({ queryKey: ['settings'] });
-    },
-    onError: (error) => {
-      toast.error(`Ошибка сохранения: ${(error as Error).message}`);
-    },
-  });
+  // const updateSettingMutation = useMutation({
+  //   mutationFn: ({ key, value, description }: { key: string; value: any; description?: string }) =>
+  //     settingsApi.updateSetting(key, value, description),
+  //   onSuccess: () => {
+  //     toast.success('Настройка сохранена');
+  //     queryClient.invalidateQueries({ queryKey: ['settings'] });
+  //   },
+  //   onError: (error) => {
+  //     toast.error(`Ошибка сохранения: ${(error as Error).message}`);
+  //   },
+  // });
 
   const handleApiKeyChange = (value: string) => {
     setApiKey(value);
@@ -36,9 +35,9 @@ function SettingsPage() {
     toast.success('API ключ сохранен локально');
   };
 
-  const handleSettingUpdate = (key: string, value: any, description?: string) => {
-    updateSettingMutation.mutate({ key, value, description });
-  };
+  // const handleSettingUpdate = (key: string, value: any, description?: string) => {
+  //   updateSettingMutation.mutate({ key, value, description });
+  // };
 
   if (isLoading) {
     return (

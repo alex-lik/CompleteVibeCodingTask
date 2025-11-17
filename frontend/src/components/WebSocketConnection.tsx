@@ -100,7 +100,7 @@ export function WebSocketConnection({
           {getStatusIcon()}
           <span className="text-xs font-medium">{getStatusText()}</span>
         </div>
-        {uptime > 0 && (
+        {uptime && uptime > 0 && (
           <div className="text-xs text-muted-foreground">
             {formatUptime(uptime)}
           </div>

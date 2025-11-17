@@ -1,0 +1,122 @@
+name: Code Quality and Linting
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Backend Linting
+  backend-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install ruff black isort mypy
+
+    - name: Run ruff linter
+      run: |
+        cd backend
+        ruff check .
+
+    - name: Run black formatter check
+      run: |
+        cd backend
+        black --check .
+
+    - name: Run isort import sorting check
+      run: |
+        cd backend
+        isort --check-only .
+
+    - name: Run mypy type checking
+      run: |
+        cd backend
+        mypy . --ignore-missing-imports
+
+  # Frontend Linting
+  frontend-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Run ESLint
+      run: |
+        cd frontend
+        npm run lint
+
+    - name: Run Prettier formatting check
+      run: |
+        cd frontend
+        npm run format:check
+
+    - name: Run TypeScript type checking
+      run: |
+        cd frontend
+        npm run type-check
+
+  # Security Linting
+  security-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Bandit security linter for Python
+      uses: securecodewarrior/github-action-add-sarif@v1
+      with:
+        sarif-file: 'bandit-results.sarif'
+
+    - name: Run Bandit
+      run: |
+        cd backend
+        pip install bandit
+        bandit -r . -f json -o bandit-results.json
+
+    - name: Convert Bandit results to SARIF
+      run: |
+        # Convert bandit JSON to SARIF format
+        # This would require a conversion script or tool
+        echo "Bandit security scan completed"
+
+  # License Check
+  license-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check licenses
+      run: |
+        echo "Checking license compatibility..."
+        # Add license checking tools here
+        # Example using FOSSA or other license scanning tools

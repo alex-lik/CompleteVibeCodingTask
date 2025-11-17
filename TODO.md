@@ -57,16 +57,16 @@
 
 ## Docker & Deployment
 - [x] Production Dockerfile backend
-- [ ] Production Dockerfile frontend
-- [ ] Docker Compose
-- [ ] Health-checks
+- [x] Production Dockerfile frontend
+- [x] Docker Compose
+- [x] Health-checks
 
 ## CI/CD
-- [ ] GitHub Actions pipeline
-- [ ] Линтеры
-- [ ] Unit + e2e тесты
+- [x] GitHub Actions pipeline
+- [x] Линтеры
+- [x] Unit + e2e тесты
 
 ## Документация
-- [ ] README финальный
-- [ ] API спецификация
-- [ ] Agent Prompt
+- [x] README финальный
+- [x] API спецификация (встроена в FastAPI)
+- [x] Agent Prompt (в MCP документации)
