@@ -130,6 +130,7 @@ async def search_tasks(
     status: Optional[str] = None,
     project_name: Optional[str] = None,
     task_name: Optional[str] = None,
+    agent: Optional[str] = None,
     from_date: Optional[datetime] = None,
     to_date: Optional[datetime] = None,
     api_key: str = Depends(get_api_key),
@@ -144,12 +145,15 @@ async def search_tasks(
     if status:
         query = query.filter(Task.status == status)
 
-    
+
     if project_name:
         query = query.join(Task.project).filter(Project.name == project_name)
 
     if task_name:
         query = query.filter(Task.title.ilike(f"%{task_name}%"))
+
+    if agent:
+        query = query.join(Task.agent).filter(Agent.name == agent)
 
     if from_date:
         query = query.filter(Task.created_at >= from_date)
