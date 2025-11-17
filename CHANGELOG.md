@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-01-17
+
+### Added
+- **User settings management system** - Complete API for user and global settings management
+- **UserSettings model** - Database model for storing user and global settings with JSON support
+- **SettingsService** - Comprehensive service for settings operations with user/global separation
+- **Settings API endpoints** - Full CRUD operations for settings:
+  - `POST /api/settings` - Create/update settings with JSON body
+  - `GET /api/settings` - Get all settings (global + user)
+  - `GET /api/settings/{key}` - Get specific setting
+  - `GET /api/user/settings` - Get only user settings
+  - `PUT /api/settings/{key}` - Update existing settings
+  - `DELETE /api/settings/{key}` - Delete specific setting
+  - `DELETE /api/user/settings` - Delete all user settings
+  - `GET /api/settings/batch` - Batch get multiple settings
+- **JSON-based settings** - Support for complex nested settings structures
+- **Global vs User settings** - Support for both global and user-specific settings
+- **Settings testing suite** - 13 comprehensive tests covering all settings functionality
+- **Schema validation** - Pydantic schemas for request/response validation
+- **API authentication integration** - All settings endpoints require API key authentication
+
+### Technical Implementation
+- **Database design**: UserSettings model with unique constraint on (user_id, key) pairs
+- **Service layer**: SettingsService with methods for create, read, update, delete operations
+- **API design**: RESTful endpoints with proper HTTP status codes and error handling
+- **Data types**: JSON storage for complex settings, supporting nested objects and arrays
+- **Priority system**: User settings override global settings for same key
+- **Validation**: Comprehensive input validation and error responses
+
+### Testing
+- **Settings creation**: Global and user settings creation with JSON payloads
+- **Settings retrieval**: Single and batch settings retrieval
+- **Settings updates**: Complete update functionality with validation
+- **Settings deletion**: Single and bulk deletion operations
+- **Authentication**: Proper API key validation across all endpoints
+- **Error handling**: 404 for missing settings, 400 for validation errors
+- **Priority testing**: User settings override global settings
+- **Mock integration**: Service layer mocking for isolated testing
+
+### API Usage Examples
+```bash
+# Create user setting
+curl -X POST http://localhost:8001/api/settings \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"setting_key": "theme", "value": "dark", "description": "Dark theme"}'
+
+# Create global setting
+curl -X POST http://localhost:8001/api/settings \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"setting_key": "default_language", "value": "en", "is_global": true}'
+
+# Get all settings
+curl -X GET http://localhost:8001/api/settings \
+  -H "X-API-Key: your-api-key"
+
+# Get specific setting
+curl -X GET http://localhost:8001/api/settings/theme \
+  -H "X-API-Key: your-api-key"
+
+# Update setting
+curl -X PUT http://localhost:8001/api/settings/theme \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"value": "light"}'
+```
+
+---
+
 ## [0.5.0] - 2025-01-17
 
 ### Added

@@ -150,3 +150,36 @@ class StatsResponse(BaseModel):
     completed_tasks: int
     failed_tasks: int
     average_duration: Optional[float] = None
+
+
+# Settings API Schemas
+class SettingsResponse(BaseModel):
+    id: int
+    key: str
+    value: Optional[Dict[str, Any]]
+    description: Optional[str]
+    is_global: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
+class SettingsCreateResponse(BaseModel):
+    id: int
+    key: str
+    value: Optional[Dict[str, Any]]
+    description: Optional[str]
+    is_global: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
+class SettingsUpdateRequest(BaseModel):
+    value: Optional[Dict[str, Any]]
+    description: Optional[str]
+    is_global: Optional[bool] = False
+
+    model_config = {"from_attributes": True}

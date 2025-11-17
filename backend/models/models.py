@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, Float, JSON, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Text, Float, JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from core.database import Base
@@ -63,12 +63,19 @@ class Task(Base):
     agent = relationship("Agent", back_populates="tasks")
 
 
-class Settings(Base):
-    __tablename__ = "settings"
+class UserSettings(Base):
+    __tablename__ = "user_settings"
 
     id = Column(Integer, primary_key=True, index=True)
-    key = Column(String(255), unique=True, index=True, nullable=False)
-    value = Column(Text, nullable=True)
+    user_id = Column(String(255), index=True, nullable=True)  # Может быть None для глобальных настроек
+    key = Column(String(255), nullable=False)
+    value = Column(JSON, nullable=True)  # Используем JSON для сложных структур
     description = Column(Text, nullable=True)
+    is_global = Column(String(50), default="false")  # true/false - глобальная настройка или пользовательская
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Уникальность пары user_id + key
+    __table_args__ = (
+        UniqueConstraint('user_id', 'key', name='uix_user_settings_key'),
+    )

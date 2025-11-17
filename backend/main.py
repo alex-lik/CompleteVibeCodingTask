@@ -10,6 +10,7 @@ from models.models import Base
 from webhook.routes import webhook_router
 from api.routes import api_router
 from webhook.websocket_routes import websocket_router
+from api.routes_settings import settings_router
 
 
 @asynccontextmanager
@@ -49,6 +50,7 @@ app.add_middleware(
 app.include_router(webhook_router, prefix="/webhook", tags=["webhook"])
 app.include_router(api_router, prefix="/api", tags=["api"])
 app.include_router(websocket_router, prefix="/webhook", tags=["websocket"])
+app.include_router(settings_router, prefix="/api", tags=["settings"])
 
 
 @app.get("/")
