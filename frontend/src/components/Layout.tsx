@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '../utils/cn';
+import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Проекты', href: '/' },

@@ -223,6 +223,13 @@ curl -X PUT http://localhost:8001/api/settings/theme \
   - **TanStack Query** - Управление состоянием и кэширование API запросов
   - **Axios** - HTTP клиент для работы с API бэкенда
   - **React Hot Toast** - Система уведомлений для пользовательского опыта
+- **shadcn/ui Component Library** - Полноценная интеграция современной UI библиотеки
+  - **Configuration Setup** - Настроены пути импорта (`@/components`, `@/lib`) в tsconfig.json и vite.config.ts
+  - **Style System** - New York стиль с полной поддержкой светлой/темной темы через CSS переменные
+  - **Base Components** - Установлены базовые компоненты: Button, Card
+  - **Utility Functions** - Интегрирована `cn()` функция для слияния CSS классов
+  - **Theme Variables** - Полный набор CSS переменных для кастомизации компонентов
+  - **Component Registry** - Настроен registry для будущих компонентов shadcn/ui
 - **UI Components** - Базовые компоненты для пользовательского интерфейса
   - **Layout Component** - Основной макет с навигацией
   - **Pages**: ProjectsPage, ProjectDetailPage, TasksPage, StatisticsPage, SettingsPage
