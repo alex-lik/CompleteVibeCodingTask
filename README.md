@@ -63,6 +63,21 @@ python main.py
 
 ## API Документация
 
+### Авторизация
+
+Все API эндпоинты требуют авторизации через API ключ.
+
+**Заголовок авторизации:**
+```
+X-API-Key: <ваш-api-ключ>
+```
+
+**Настройка API ключа:**
+```bash
+# В файле .env
+API_KEY=ваш-секретный-api-ключ
+```
+
 ### Вебхук эндпоинты
 
 #### Start Webhook
@@ -134,9 +149,12 @@ Content-Type: application/json
 
 ### REST API эндпоинты
 
+Все REST API эндпоинты требуют авторизации через заголовок `X-API-Key`.
+
 #### Получить список проектов
 ```bash
 GET /api/projects
+Headers: X-API-Key: <your-api-key>
 Response:
 [
   {
@@ -181,6 +199,7 @@ Response:
 #### Получить статистику WebSocket подключений
 ```bash
 GET /api/websocket/stats
+Headers: X-API-Key: <your-api-key>
 Response:
 {
   "total_connections": 3,
@@ -189,6 +208,14 @@ Response:
     "another-project": 1
   }
 }
+```
+
+### WebSocket уведомления
+
+WebSocket эндпоинт также требует авторизации через query параметр:
+
+```bash
+ws://localhost:8000/webhook/ws?api_key=<your-api-key>&project=my-project
 ```
 
 ## Тестирование

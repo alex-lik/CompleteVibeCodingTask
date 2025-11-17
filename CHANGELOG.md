@@ -9,9 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Frontend implementation with React and shadcn/ui
-- Authentication system enhancements
 - Production Docker configuration
 - CI/CD pipeline setup
+
+### Added
+- **Extended API Key authentication** - Full authorization system implementation
+- Unified security module (`core/security.py`) with common authentication functions
+- API Key authorization for all REST API endpoints (`/api/*`)
+- API Key authorization for WebSocket connections through query parameters
+- Enhanced test suite with authentication tests
+- Comprehensive documentation of authentication requirements
+
+### Changed
+- **Security**: Updated all webhook endpoints to use unified authentication system
+- **API**: All REST API endpoints now require X-API-Key header
+- **WebSocket**: Enhanced security with API key validation
+- **Tests**: Updated all test files to include proper authentication headers
+- **Documentation**: Added authentication sections to API documentation
 
 ---
 

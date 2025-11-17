@@ -7,6 +7,7 @@ import os
 
 from main import app
 from core.database import get_db, Base
+from core.config import settings
 from models.models import Project, Task, Agent
 
 # Создаем тестовую базу данных
@@ -24,6 +25,9 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
+
+# Заголовок с API ключом для тестов
+headers = {"X-API-Key": settings.API_KEY}
 
 @pytest.fixture(scope="function")
 def setup_test_db():
@@ -93,7 +97,7 @@ def test_health_endpoint():
 
 def test_get_projects(setup_test_db):
     """Тест получения списка проектов"""
-    response = client.get("/api/projects")
+    response = client.get("/api/projects", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -101,19 +105,19 @@ def test_get_projects(setup_test_db):
 
 def test_get_project(setup_test_db):
     """Тест получения информации о проекте"""
-    response = client.get("/api/projects/test_project")
+    response = client.get("/api/projects/test_project", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "test_project"
 
 def test_get_nonexistent_project(setup_test_db):
     """Тест получения несуществующего проекта"""
-    response = client.get("/api/projects/nonexistent")
+    response = client.get("/api/projects/nonexistent", headers=headers)
     assert response.status_code == 404
 
 def test_get_project_tasks(setup_test_db):
     """Тест получения задач проекта"""
-    response = client.get("/api/projects/test_project/tasks")
+    response = client.get("/api/projects/test_project/tasks", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 2
@@ -123,7 +127,7 @@ def test_get_project_tasks(setup_test_db):
 
 def test_get_project_tasks_with_filter(setup_test_db):
     """Тест получения задач проекта с фильтрацией"""
-    response = client.get("/api/projects/test_project/tasks?status=completed")
+    response = client.get("/api/projects/test_project/tasks?status=completed", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -131,7 +135,7 @@ def test_get_project_tasks_with_filter(setup_test_db):
 
 def test_get_task(setup_test_db):
     """Тест получения информации о задаче"""
-    response = client.get("/api/tasks/task_1")
+    response = client.get("/api/tasks/task_1", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["task_id"] == "task_1"
@@ -140,12 +144,12 @@ def test_get_task(setup_test_db):
 
 def test_get_nonexistent_task(setup_test_db):
     """Тест получения несуществующей задачи"""
-    response = client.get("/api/tasks/nonexistent")
+    response = client.get("/api/tasks/nonexistent", headers=headers)
     assert response.status_code == 404
 
 def test_get_stats(setup_test_db):
     """Тест получения статистики"""
-    response = client.get("/api/stats")
+    response = client.get("/api/stats", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["total_projects"] == 1
@@ -172,5 +176,5 @@ def test_api_without_db():
     # Очищаем переопределение зависимости
     app.dependency_overrides.clear()
 
-    response = client.get("/api/projects")
+    response = client.get("/api/projects", headers=headers)
     assert response.status_code == 500  # Ошибка из-за отсутствия DB

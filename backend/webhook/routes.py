@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from models.schemas import WebhookStart, WebhookFinish, WebhookStatus, WebhookError
 from core.config import settings
+from core.security import get_api_key
 from core.database import get_db
 from services.webhook_service import WebhookService
 # from services.websocket_service import websocket_service  # Временно отключен
@@ -14,19 +15,10 @@ webhook_router = APIRouter()
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
-async def verify_api_key(api_key: str = Depends(api_key_header)):
-    if api_key != settings.API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API Key"
-        )
-    return api_key
-
-
 @webhook_router.post("/start", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_start(
     data: WebhookStart,
-    api_key: str = Depends(verify_api_key),
+    api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
@@ -67,7 +59,7 @@ async def webhook_start(
 @webhook_router.post("/finish", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_finish(
     data: WebhookFinish,
-    api_key: str = Depends(verify_api_key),
+    api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
@@ -119,7 +111,7 @@ async def webhook_finish(
 @webhook_router.post("/status", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_status(
     data: WebhookStatus,
-    api_key: str = Depends(verify_api_key),
+    api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
@@ -170,7 +162,7 @@ async def webhook_status(
 @webhook_router.post("/error", status_code=status.HTTP_202_ACCEPTED)
 async def webhook_error(
     data: WebhookError,
-    api_key: str = Depends(verify_api_key),
+    api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """

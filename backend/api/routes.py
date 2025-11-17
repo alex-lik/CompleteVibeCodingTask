@@ -5,6 +5,7 @@ from typing import List, Optional
 from datetime import datetime, timezone
 
 from core.database import get_db
+from core.security import get_api_key
 from models.models import Project, Task
 from models.schemas import ProjectResponse, TaskResponse, StatsResponse
 from services.websocket_service import websocket_service
@@ -13,7 +14,10 @@ api_router = APIRouter()
 
 
 @api_router.get("/projects", response_model=List[ProjectResponse])
-async def get_projects(db: Session = Depends(get_db)):
+async def get_projects(
+    api_key: str = Depends(get_api_key),
+    db: Session = Depends(get_db)
+):
     """
     Получить список всех проектов
     """
@@ -22,7 +26,11 @@ async def get_projects(db: Session = Depends(get_db)):
 
 
 @api_router.get("/projects/{project_name}", response_model=ProjectResponse)
-async def get_project(project_name: str, db: Session = Depends(get_db)):
+async def get_project(
+    project_name: str,
+    api_key: str = Depends(get_api_key),
+    db: Session = Depends(get_db)
+):
     """
     Получить информацию о конкретном проекте
     """
@@ -38,6 +46,7 @@ async def get_project_tasks(
     limit: int = 50,
     offset: int = 0,
     status: Optional[str] = None,
+    api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ):
     """
@@ -57,7 +66,11 @@ async def get_project_tasks(
 
 
 @api_router.get("/tasks/{task_id}", response_model=TaskResponse)
-async def get_task(task_id: str, db: Session = Depends(get_db)):
+async def get_task(
+    task_id: str,
+    api_key: str = Depends(get_api_key),
+    db: Session = Depends(get_db)
+):
     """
     Получить детальную информацию о задаче
     """
@@ -68,7 +81,10 @@ async def get_task(task_id: str, db: Session = Depends(get_db)):
 
 
 @api_router.get("/stats", response_model=StatsResponse)
-async def get_stats(db: Session = Depends(get_db)):
+async def get_stats(
+    api_key: str = Depends(get_api_key),
+    db: Session = Depends(get_db)
+):
     """
     Получить общую статистику
     """
@@ -106,7 +122,9 @@ async def get_stats(db: Session = Depends(get_db)):
 
 
 @api_router.get("/websocket/stats")
-async def get_websocket_stats():
+async def get_websocket_stats(
+    api_key: str = Depends(get_api_key)
+):
     """
     Получить статистику WebSocket подключений
     """

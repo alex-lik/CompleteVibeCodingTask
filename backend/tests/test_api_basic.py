@@ -2,8 +2,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app
+from core.config import settings
 
 client = TestClient(app)
+
+# Заголовок с API ключом для тестов
+headers = {"X-API-Key": settings.API_KEY}
 
 def test_root_endpoint():
     """Тест корневого эндпоинта"""
@@ -71,7 +75,7 @@ def test_api_endpoints_structure():
     ]
 
     for endpoint in endpoints:
-        response = client.get(endpoint)
+        response = client.get(endpoint, headers=headers)
         # Должен вернуть 500 (ошибка БД) или 200 (пустые данные)
         assert response.status_code in [200, 500]
 
