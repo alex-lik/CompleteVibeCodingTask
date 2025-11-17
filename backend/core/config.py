@@ -5,10 +5,10 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/agent_tracker"
+    DATABASE_URL: str = "sqlite:///./agent_tracker.db"
 
     # Redis
-    REDIS_URL: str = "redis://localhost:6379"
+    REDIS_URL: str = "redis://localhost:6379/0"
 
     # API
     HOST: str = "0.0.0.0"

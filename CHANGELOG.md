@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-01-17
+
+### Added
+- **Complete API testing suite** - Comprehensive test coverage with 15+ passing tests
+- **Basic endpoint testing** - Health checks, documentation access, and basic API functionality
+- **API structure validation** - Endpoint availability and response format testing
+- **WebSocket testing** - WebSocket endpoints and connection statistics validation
+- **Authentication testing** - API key validation and security endpoint tests
+- **Test configuration** - Mock services and test database setup
+- **Error handling testing** - Proper HTTP status codes and error responses
+
+### Changed
+- **Test suite**: Organized test files by functionality (basic API, WebSocket, API specific)
+- **Testing framework**: Integrated pytest with TestClient for FastAPI testing
+- **Mock services**: Added WebSocket service mocking for isolated testing
+- **Documentation**: Updated TODO.md to reflect completed tasks
+- **Configuration**: Switched to SQLite for testing environment compatibility
+
+### Tested
+- **Health endpoints** - `/health`, `/db-check`, `/redis-check` functionality
+- **API documentation** - Swagger UI, ReDoc, and OpenAPI spec accessibility
+- **Webhook endpoints** - Structure validation and authentication checks
+- **REST API endpoints** - Project, task, and statistics endpoint availability
+- **WebSocket endpoints** - Connection statistics and endpoint validation
+- **Authentication** - API key validation across all endpoint types
+
+---
+
 ## [Unreleased]
 
 ### Planned
