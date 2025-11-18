@@ -11,18 +11,18 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 3050,
     proxy: {
       '/api': {
-        target: 'http://localhost:8002',
+        target: 'http://localhost:8050',
         changeOrigin: true,
       },
       '/webhook': {
-        target: 'http://localhost:8002',
+        target: 'http://localhost:8050',
         changeOrigin: true,
       },
       '/ws': {
-        target: 'ws://localhost:8002',
+        target: 'ws://localhost:8050',
         ws: true,
       }
     }
